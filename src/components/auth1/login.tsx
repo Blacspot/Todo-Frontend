@@ -1,10 +1,12 @@
-import Navbar from '../Navbar/Navbar'
+import Navbar from "../Navbar/Navbar"
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup'; //validator
-import { loginAPI } from '../../features/auth/loginAPI';
-import { loginSuccess } from '../../features/auth/userSlice';
-
+import { loginAPI } from "../../features/auth/loginAPI";
+import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../features/auth/usersSlice";
+import { useNavigate } from "react-router";
 
 type LoginInputs = {
     email: string;
@@ -16,9 +18,11 @@ const schema = yup.object({
     password: yup.string().min(6, 'Min 6 characters').max(20, 'Max 20 characters').required('Password is required'),
 });
 export const Login = () => {
-    const dispatch = useDispatch
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
-    const [loginUser, { isLoading }] loginAPI.useLoginUserMutation()
+    const [loginUser, { isLoading }] = loginAPI.useLoginUserMutation()
+
 
     const {
         register,
@@ -29,16 +33,27 @@ export const Login = () => {
     })
 
     const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
-       try {
-        const response = await loginUser(data).unwrap()
-        //console.log(response);
-        toast.success(response.message)
+        try {
+            const response = await loginUser(data).unwrap()
+            // console.log(response);
+            toast.success(response.message)
+            // dispatch- store user info
+            dispatch(loginSuccess(response))
 
-        dispatch(loginSuccess(response))
-        
-       } catch (error: any) {
-         //console.log(error.data.error);
-       } 
+            if (response.user.role === 'admin') {
+                navigate('/admin/dashboard/todos')
+            } else if (response.user.role === 'user') {
+                navigate('/user/dashboard/todos')
+            }
+
+
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            // console.log(error.data.error);
+            toast.error(error.data.error)
+
+        }
     }
 
 
@@ -74,12 +89,17 @@ export const Login = () => {
                         )}
 
 
-                        <button
-                         type="submit" 
-                         className="btn btn-primary w-full mt-4"
-                         disabled={isLoading}>
-                            Login
-                            </button>
+                        {/* <button type="submit" className="btn btn-primary w-full mt-4">Login</button> */}
+
+                        <button type="submit" className="btn btn-primary w-full mt-4" disabled={isLoading}>
+                            {
+                                isLoading ? (
+                                    <>
+                                        <span className="loading loading-spinner text-primary" /> Please wait...
+                                    </>
+                                ) : "Login"
+                            }
+                        </button>
                     </form>
                 </div>
             </div>

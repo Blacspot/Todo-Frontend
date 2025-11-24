@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistStore } from "redux-persist";
 import { persistReducer } from "redux-persist";
 import  storage  from "redux-persist/lib/storage";
-import { usersAPI } from "../features/auth/userAPI";
+import { usersAPI } from "../features/auth/usersAPI";
 import { loginAPI } from "../features/auth/loginAPI";
 import { todoAPI } from "../features/todo/todoAPI";
 

@@ -1,10 +1,10 @@
-import Navbar from '../Navbar/Navbar';
+import Navbar from "../Navbar/Navbar"
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup'; //validator
-import { toast } from 'sonner';
-import { usersAPI } from '../../features/auth/userAPI';
-import { useLocation } from 'react-router';
+import { usersAPI } from "../../features/auth/usersAPI"
+import { toast } from "sonner";
+import { useLocation } from "react-router";
 
 
 type VerifyInputs = {
@@ -14,13 +14,16 @@ type VerifyInputs = {
 
 const schema = yup.object({
     email: yup.string().email('Invalid email').max(100, 'Max 100 characters').required('Email is required'),
-    code: yup.string().min(6, 'Code must be at least 6 characters').max(6, 'Code must be at most 6 characters').required('Code is required'),
+    code: yup.string().min(6, 'Max 6 characters').required('Code is required'),
 });
+
+
 export const Verification = () => {
     const [verifyUser, { isLoading }] = usersAPI.useVerifyUserMutation()
     const location = useLocation()
 
     const emailState = location.state.email || ''
+
 
     const {
         register,
@@ -30,18 +33,19 @@ export const Verification = () => {
         resolver: yupResolver(schema),
         defaultValues: {
             email: emailState
-        },
+        }
     })
     const onSubmit: SubmitHandler<VerifyInputs> = async (data) => {
-       try {
-        const response = await verifyUser(data).unwrap()
-        console.log("Response", response);
-        toast.success(response.message)
-       } catch (error: any) {
-        console.log("Error", error);
-        toast.error(error.data.message)
-        
-       } 
+        try {
+            const response = await verifyUser(data).unwrap()
+            console.log("Response", response);
+            toast.success(response.message)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            console.log("Error", error);
+            toast.error(error.data.message)
+
+        }
     }
 
     return (
@@ -63,9 +67,9 @@ export const Verification = () => {
                         )}
 
                         <input
-                            type="text"
+                            type="number"
                             {...register("code")}
-                            placeholder="Verification Code"
+                            placeholder="Code"
                             className="input border border-gray-300 rounded w-full p-2 text-lg"
 
                         />
@@ -74,7 +78,8 @@ export const Verification = () => {
                         )}
 
 
-                         <button type="submit" className="btn btn-primary w-full mt-4" disabled={isLoading}>
+                        {/* <button type="submit" className="btn btn-primary w-full mt-4">Verify your Account</button> */}
+                        <button type="submit" className="btn btn-primary w-full mt-4" disabled={isLoading}>
                             {
                                 isLoading ? (
                                     <>
